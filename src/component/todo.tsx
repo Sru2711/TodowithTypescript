@@ -1,16 +1,42 @@
 import React, { useState, useEffect, useRef, FC } from 'react'
-import { Button, Table } from 'reactstrap'
+import { Button, Input, Table } from 'reactstrap'
 import "../style/todo.scss"
 
-interface todoProps  {
-    data: { id: number, task: string }[]
-    handleEdit:()=> void
-    handleDelete:(id:number)=>void
-}
-const Todo: FC<todoProps> = ({ data,handleEdit,handleDelete }) => {
 
-    const deleteFunction =(id:number) => {
+
+
+interface todoProps {
+
+    data: { id: number, task: string }[]
+    handleEdit: (id: number) => void
+    edit: boolean
+    setEdit:(edit:boolean)=>void
+    currentId:number
+    handleDelete: (id: number) => void
+    handleSave: (id: number, task:string) => void
+}
+
+const Todo: FC<todoProps> = ({ data, handleEdit, handleDelete,handleSave,setEdit, edit,currentId}) => {
+
+    const [inputChangedValue, setInputChangedValue] = useState<string>(" ")
+    
+
+    const deleteFunction = (id: number) => {
         handleDelete(id)
+    }
+
+    const onEdit = (id: number) => {
+        handleEdit(id)
+    };
+
+    const handleChange = (e: string) => {
+        setInputChangedValue(e)
+    }
+
+    const onSave = (id:number) => {
+        handleSave(id, inputChangedValue)
+        setInputChangedValue("")
+        setEdit(false)
     }
     return (
         <div className="table-div">
@@ -38,7 +64,7 @@ const Todo: FC<todoProps> = ({ data,handleEdit,handleDelete }) => {
                 </thead>
                 <tbody className="tbody">
                     {data.map((data) => {
-                      
+
                         return (
                             <>
                                 <tr>
@@ -49,15 +75,33 @@ const Todo: FC<todoProps> = ({ data,handleEdit,handleDelete }) => {
 
                                     </th>
                                     <td className="td1">
-                                        <span className="mx-2">
-                                            {data.task}
-                                        </span>
+                                        {
+                                            edit && currentId === data.id ?
+                                                <span className="mx-2"  key={data.id}>
+
+                                                    <input type="text" value={ inputChangedValue} onChange={(e)=>{handleChange(e.target.value)}}/>
+
+                                                </span>
+                                                :
+                                                <span className="mx-2" key={data.id}>
+
+
+                                                    <span>{data.task}</span>
+
+                                                </span>
+                                        }
+
 
                                     </td>
                                     <td className="td2">
-                                        <div className="button">
-                                            <Button className='edit-button m-1' onClick={()=>{handleEdit()}}>Edit</Button>
-                                            <Button className='delete-button m-2' onClick={()=>{deleteFunction(data.id)}}>Delete</Button>
+                                        <div className="button" key={data.id}>
+                                            {
+                                                edit ? <Button className='edit-button m-1' onClick={() => { onSave(data.id)  }}>Save</Button>
+                                                    :
+                                                    <Button className='edit-button m-1' onClick={() => { onEdit(data.id) }}>Edit</Button>
+                                            }
+
+                                            <Button className='delete-button m-2' onClick={() => { deleteFunction(data.id) }}>Delete</Button>
 
                                         </div>
                                     </td>

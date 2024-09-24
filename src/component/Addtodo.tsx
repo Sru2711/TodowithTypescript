@@ -8,9 +8,11 @@ type dataList =
 const Addtodo: FC = () => {
     const [task, setTask] = useState<string>('');
     const [data, setData] = useState<dataList>([]);
+    
+    const[edit, setEdit]=useState<boolean>(false)
+    const [currentId, setCurrentId] = useState<number>(0);
 
     const handleChange = (e:string) => {
-     console.log("e",e)
      setTask(e)
     }
 
@@ -19,8 +21,10 @@ const Addtodo: FC = () => {
         setTask("")
     }
   
-    const handleEdit= () => {
-       console.log("Edit function Called")
+    const handleEdit= (id:number)=> {
+    
+       setEdit(true);
+       setCurrentId(id)
     }
   
     const handleDelete =(id:number) => {
@@ -29,14 +33,24 @@ const Addtodo: FC = () => {
             if(data.id !== id) {
                 return data
             }
-            return expectForTheDeleted
+           
         })
         setData(expectForTheDeleted)
     }
-    useEffect(()=>{
-        console.log("task",task);
-     console.log("data",data);
-    },[])
+
+    const handleSave = (id:number, task: string) => {
+        console.log("id, task",id,task)
+        const editedData= data.map((obj)=> {
+            if(obj.id===id){
+                return {...obj, task:task}
+            }
+            return obj
+        })
+        setData(editedData)
+     
+        
+    }
+    
 
     return (
         <div>
@@ -56,6 +70,10 @@ const Addtodo: FC = () => {
             <Todo 
             handleEdit={handleEdit}
             handleDelete={handleDelete}
+            edit={edit}
+            setEdit={setEdit}
+            currentId={currentId}
+            handleSave={handleSave}
             data={data}
             />
         </div>
